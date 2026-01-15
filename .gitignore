@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+
+# 압축 패키지 (배포용)
+*.zip
+*.crx
+
+# 에디터/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 로그
+*.log
