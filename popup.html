@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>자세교정 알리미</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>거북목 알리미</h1>
+    </div>
+
+    <div class="status-section">
+      <img id="statusIcon" src="images/neckno.png" alt="상태" class="status-icon">
+      <p id="elapsedTime" class="elapsed-time">0분 경과</p>
+      <p id="statusText" class="status-text">좋은 자세예요!</p>
+    </div>
+
+    <button id="resetBtn" class="reset-button">자세 교정 완료</button>
+
+    <div class="settings-section">
+      <div class="settings-header">알림 시간 설정</div>
+
+      <div class="setting-row">
+        <label for="warningTime">첫 번째 알림</label>
+        <div class="input-group">
+          <input type="number" id="warningTime" min="1" max="120" value="20">
+          <span class="unit">분</span>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <label for="dangerTime">두 번째 알림</label>
+        <div class="input-group">
+          <input type="number" id="dangerTime" min="1" max="180" value="50">
+          <span class="unit">분</span>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <label for="notificationToggle">알림 받기</label>
+        <label class="toggle">
+          <input type="checkbox" id="notificationToggle" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <button id="saveBtn" class="save-button">저장</button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>

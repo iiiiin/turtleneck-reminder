@@ -1,0 +1,343 @@
+/* 기본 스타일 - Chrome 기본 디자인 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  width: 280px;
+  background: #fff;
+  color: #202124;
+  font-size: 13px;
+}
+
+.container {
+  padding: 16px;
+}
+
+/* 헤더 */
+.header {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.header h1 {
+  font-size: 14px;
+  font-weight: 500;
+  color: #202124;
+}
+
+/* 상태 섹션 */
+.status-section {
+  text-align: center;
+  padding: 16px;
+  margin-bottom: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.status-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 12px;
+}
+
+.elapsed-time {
+  font-size: 12px;
+  color: #5f6368;
+  margin-bottom: 4px;
+}
+
+.status-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1a73e8;
+}
+
+body.warning .status-text {
+  color: #ea8600;
+}
+
+body.danger .status-text {
+  color: #d93025;
+}
+
+/* 버튼 */
+.reset-button {
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  background: #1a73e8;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.reset-button:hover {
+  background: #1557b0;
+}
+
+.reset-button:active,
+.reset-button.clicked {
+  background: #104a9e;
+}
+
+body.warning .reset-button {
+  background: #ea8600;
+}
+
+body.warning .reset-button:hover {
+  background: #c77400;
+}
+
+body.danger .reset-button {
+  background: #d93025;
+}
+
+body.danger .reset-button:hover {
+  background: #b3261e;
+}
+
+/* 설정 섹션 */
+.settings-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.settings-header {
+  font-size: 12px;
+  font-weight: 500;
+  color: #5f6368;
+  margin-bottom: 12px;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.setting-row label {
+  font-size: 13px;
+  color: #202124;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.input-group input {
+  width: 60px;
+  padding: 6px 8px;
+  font-size: 13px;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  text-align: right;
+  outline: none;
+  background: #fff;
+  color: #202124;
+}
+
+.input-group input:focus {
+  border-color: #1a73e8;
+}
+
+.input-group .unit {
+  font-size: 12px;
+  color: #5f6368;
+}
+
+/* 토글 스위치 */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #dadce0;
+  transition: 0.2s;
+  border-radius: 20px;
+}
+
+.toggle-slider::before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.2s;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.toggle input:checked+.toggle-slider {
+  background-color: #1a73e8;
+}
+
+.toggle input:checked+.toggle-slider::before {
+  transform: translateX(16px);
+}
+
+/* 저장 버튼 */
+.save-button {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1a73e8;
+  background: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.save-button:hover {
+  background: #f8f9fa;
+}
+
+.save-button.saved {
+  color: #188038;
+  border-color: #188038;
+}
+
+/* ==================== */
+/* 다크모드 스타일 */
+/* ==================== */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #202124;
+    color: #e8eaed;
+  }
+
+  .header {
+    border-bottom-color: #3c4043;
+  }
+
+  .header h1 {
+    color: #e8eaed;
+  }
+
+  .status-section {
+    background: #292a2d;
+  }
+
+  .elapsed-time {
+    color: #9aa0a6;
+  }
+
+  .status-text {
+    color: #8ab4f8;
+  }
+
+  body.warning .status-text {
+    color: #fdd663;
+  }
+
+  body.danger .status-text {
+    color: #f28b82;
+  }
+
+  .reset-button {
+    background: #8ab4f8;
+    color: #202124;
+  }
+
+  .reset-button:hover {
+    background: #aecbfa;
+  }
+
+  body.warning .reset-button {
+    background: #fdd663;
+    color: #202124;
+  }
+
+  body.warning .reset-button:hover {
+    background: #fee48f;
+  }
+
+  body.danger .reset-button {
+    background: #f28b82;
+    color: #202124;
+  }
+
+  body.danger .reset-button:hover {
+    background: #f6aca6;
+  }
+
+  .settings-section {
+    border-top-color: #3c4043;
+  }
+
+  .settings-header {
+    color: #9aa0a6;
+  }
+
+  .setting-row label {
+    color: #e8eaed;
+  }
+
+  .input-group input {
+    background: #292a2d;
+    border-color: #3c4043;
+    color: #e8eaed;
+  }
+
+  .input-group input:focus {
+    border-color: #8ab4f8;
+  }
+
+  .input-group .unit {
+    color: #9aa0a6;
+  }
+
+  .toggle-slider {
+    background-color: #5f6368;
+  }
+
+  .toggle input:checked+.toggle-slider {
+    background-color: #8ab4f8;
+  }
+
+  .save-button {
+    background: #292a2d;
+    border-color: #3c4043;
+    color: #8ab4f8;
+  }
+
+  .save-button:hover {
+    background: #3c4043;
+  }
+
+  .save-button.saved {
+    color: #81c995;
+    border-color: #81c995;
+  }
+}
