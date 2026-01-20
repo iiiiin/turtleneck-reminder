@@ -1,9 +1,9 @@
 # 거북목 알리미 (Turtle Neck Reminder)
 
 
-![alt text](image.png)
+<!-- ![alt text](image.png) -->
 ![alt text](image-1.png) 
-![alt text](image-2.png)
+<!-- ![alt text](image-2.png) -->
 
 
 브라우저 사용 시간에 따라 자세 교정을 알려주는 Chrome 확장프로그램입니다.
@@ -23,9 +23,9 @@
 
 | 시간 | 아이콘 | 상태 |
 |------|--------|------|
-| 0분 ~ | 🐢 정상 | 좋은 자세예요! |
-| 첫 번째 알림 시간 ~ | 🐢 경고 | 자세를 점검해주세요 |
-| 두 번째 알림 시간 ~ | 🐢 위험 | 지금 바로 스트레칭하세요! |
+| 0분 ~ | ![neckno](images/neckno.png) | 좋은 자세예요! |
+| 첫 번째 알림 시간 ~ | ![neckshort](images/neckshort.png) | 자세를 점검해주세요 |
+| 두 번째 알림 시간 ~ | ![necklong](images/necklong.png) | 지금 바로 스트레칭하세요! |
 
 ## 설치 방법
 
