@@ -18,6 +18,17 @@ chrome.runtime.onStartup.addListener(async () => {
   await initializeTimer();
 });
 
+// 서비스 워커 활성화 시 (중요!)
+// 서비스 워커가 깨어날 때마다 알람이 설정되어 있는지 확인
+(async () => {
+  const alarm = await chrome.alarms.get(ALARM_NAME);
+  if (!alarm) {
+    await startAlarm();
+  }
+  // 즉시 아이콘 상태 업데이트
+  await checkAndUpdateIcon();
+})();
+
 // 타이머 초기화
 async function initializeTimer() {
   const result = await chrome.storage.local.get(['startTime', 'notifiedWarning', 'notifiedDanger', 'times', 'notificationEnabled']);
@@ -64,9 +75,11 @@ async function checkAndUpdateIcon() {
   const result = await chrome.storage.local.get(['startTime', 'notifiedWarning', 'notifiedDanger', 'times', 'notificationEnabled']);
   const startTime = result.startTime;
   const times = result.times || DEFAULT_TIMES;
-  const notificationEnabled = result.notificationEnabled !== false;
+  const notificationEnabled = result.notificationEnabled === true;
 
-  if (!startTime) return;
+  if (!startTime) {
+    return;
+  }
 
   const elapsedMinutes = Math.floor((Date.now() - startTime) / 1000 / 60);
 
@@ -159,7 +172,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.action === 'getNotificationEnabled') {
-    getNotificationEnabled().then((data) => sendResponse(data));
+    getNotificationEnabled().then((data) => sendResponse({ enabled: data }));
     return true;
   }
 });
@@ -186,7 +199,12 @@ async function getStatus() {
 
 // 시간 설정 업데이트
 async function updateTimes(times) {
-  await chrome.storage.local.set({ times });
+  // 알림 플래그 초기화 (시간 변경 시)
+  await chrome.storage.local.set({
+    times,
+    notifiedWarning: false,
+    notifiedDanger: false
+  });
   await checkAndUpdateIcon();
 }
 
@@ -198,11 +216,11 @@ async function getTimes() {
 
 // 알림 설정
 async function setNotificationEnabled(enabled) {
-  await chrome.storage.local.set({ notificationEnabled: enabled });
+  await chrome.storage.local.set({ notificationEnabled: enabled === true });
 }
 
 // 알림 설정 반환
 async function getNotificationEnabled() {
   const result = await chrome.storage.local.get(['notificationEnabled']);
-  return result.notificationEnabled !== false;
+  return result.notificationEnabled === true;
 }

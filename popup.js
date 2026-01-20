@@ -57,8 +57,9 @@ async function loadSettings() {
     warningTimeInput.value = times.warning;
     dangerTimeInput.value = times.danger;
 
-    const notificationEnabled = await chrome.runtime.sendMessage({ action: 'getNotificationEnabled' });
-    notificationToggle.checked = notificationEnabled;
+    const response = await chrome.runtime.sendMessage({ action: 'getNotificationEnabled' });
+    // response는 { enabled: boolean } 형태
+    notificationToggle.checked = response.enabled === true;
 }
 
 // 리셋 버튼

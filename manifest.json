@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "거북목 자세교정 알리미",
+  "name": "거북목 알리미",
   "version": "1.0.0",
   "description": "일정 시간마다 자세를 점검하도록 알려주는 확장프로그램입니다.",
   "permissions": [
