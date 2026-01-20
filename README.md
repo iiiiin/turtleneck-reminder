@@ -24,7 +24,7 @@
 ## 설치 방법
 
 ### Chrome 웹스토어
-(출시 후 링크 추가 예정)
+[바로가기](https://chromewebstore.google.com/detail/dnojahjhfhgblnfggidnhjnjmfeeenmi?utm_source=item-share-cb)
 
 ### 개발자 모드 설치
 1. 이 저장소를 클론하거나 다운로드
