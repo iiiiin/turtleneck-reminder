@@ -1,4 +1,10 @@
-# 🐢 거북목 알리미 (Turtle Neck Reminder)
+# 거북목 알리미 (Turtle Neck Reminder)
+
+
+![alt text](image.png)
+![alt text](image-1.png) 
+![alt text](image-2.png)
+
 
 브라우저 사용 시간에 따라 자세 교정을 알려주는 Chrome 확장프로그램입니다.
 
