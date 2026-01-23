@@ -6,17 +6,24 @@ const resetBtn = document.getElementById('resetBtn');
 const warningTimeInput = document.getElementById('warningTime');
 const dangerTimeInput = document.getElementById('dangerTime');
 const notificationToggle = document.getElementById('notificationToggle');
+const reminderTypeSelect = document.getElementById('reminderType');
 const saveBtn = document.getElementById('saveBtn');
-
-// 상태 메시지
-const STATUS_MESSAGES = {
-    good: '좋은 자세예요!',
-    warning: '자세를 점검해주세요',
-    danger: '지금 바로 스트레칭하세요!'
+const ICONS = {
+    turtle: {
+        good: 'images/neck_no.png',
+        warning: 'images/neck_short.png',
+        danger: 'images/neck_long.png'
+    },
+    giraffe: {
+        good: 'images/giraffe_no.png',
+        warning: 'images/giraffe_short.png',
+        danger: 'images/giraffe_long.png'
+    }
 };
 
 // 팝업 열릴 때
 document.addEventListener('DOMContentLoaded', async () => {
+    localizeUI();
     await updateStatus();
     await loadSettings();
 });
@@ -24,23 +31,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 // 상태 업데이트
 async function updateStatus() {
     const response = await chrome.runtime.sendMessage({ action: 'getStatus' });
-    const { elapsedMinutes, times } = response;
+    const { elapsedMinutes, times, reminderType } = response;
 
-    elapsedTimeEl.textContent = `${elapsedMinutes}분 경과`;
+    elapsedTimeEl.textContent = chrome.i18n.getMessage('elapsed_time', [elapsedMinutes.toString()]);
 
     let iconPath, message, stateClass;
 
     if (elapsedMinutes >= times.danger) {
-        iconPath = 'images/necklong.png';
-        message = STATUS_MESSAGES.danger;
+        iconPath = getIconPath(reminderType, 'danger');
+        message = chrome.i18n.getMessage('status_danger');
         stateClass = 'danger';
     } else if (elapsedMinutes >= times.warning) {
-        iconPath = 'images/neckshort.png';
-        message = STATUS_MESSAGES.warning;
+        iconPath = getIconPath(reminderType, 'warning');
+        message = chrome.i18n.getMessage('status_warning');
         stateClass = 'warning';
     } else {
-        iconPath = 'images/neckno.png';
-        message = STATUS_MESSAGES.good;
+        iconPath = getIconPath(reminderType, 'good');
+        message = chrome.i18n.getMessage('status_good');
         stateClass = 'good';
     }
 
@@ -60,6 +67,9 @@ async function loadSettings() {
     const response = await chrome.runtime.sendMessage({ action: 'getNotificationEnabled' });
     // response는 { enabled: boolean } 형태
     notificationToggle.checked = response.enabled === true;
+
+    const reminderResponse = await chrome.runtime.sendMessage({ action: 'getReminderType' });
+    reminderTypeSelect.value = reminderResponse.reminderType || 'turtle';
 }
 
 // 리셋 버튼
@@ -78,13 +88,22 @@ notificationToggle.addEventListener('change', async () => {
     });
 });
 
+// 알리미 선택 변경 시 즉시 저장
+reminderTypeSelect.addEventListener('change', async () => {
+    await chrome.runtime.sendMessage({
+        action: 'setReminderType',
+        reminderType: reminderTypeSelect.value
+    });
+    await updateStatus();
+});
+
 // 저장 버튼
 saveBtn.addEventListener('click', async () => {
     const warning = parseInt(warningTimeInput.value) || 20;
     const danger = parseInt(dangerTimeInput.value) || 50;
 
     if (warning >= danger) {
-        alert('첫 번째 알림 시간은 두 번째보다 작아야 합니다.');
+        alert(chrome.i18n.getMessage('alert_warning_before_danger'));
         return;
     }
 
@@ -93,13 +112,26 @@ saveBtn.addEventListener('click', async () => {
         times: { warning, danger }
     });
 
-    saveBtn.textContent = '저장됨';
+    saveBtn.textContent = chrome.i18n.getMessage('save_done');
     saveBtn.classList.add('saved');
 
     setTimeout(() => {
-        saveBtn.textContent = '저장';
+        saveBtn.textContent = chrome.i18n.getMessage('save_button');
         saveBtn.classList.remove('saved');
     }, 1500);
 
     await updateStatus();
 });
+
+function localizeUI() {
+    document.querySelectorAll('[data-i18n]').forEach((el) => {
+        const key = el.getAttribute('data-i18n');
+        const msg = chrome.i18n.getMessage(key);
+        if (msg) el.textContent = msg;
+    });
+}
+
+function getIconPath(reminderType, level) {
+    const type = reminderType === 'giraffe' ? 'giraffe' : 'turtle';
+    return (ICONS[type] && ICONS[type][level]) || ICONS.turtle.good;
+}

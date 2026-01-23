@@ -23,9 +23,9 @@
 
 | 시간 | 아이콘 | 상태 |
 |------|--------|------|
-| 0분 ~ | ![neckno](images/neckno.png) | 좋은 자세예요! |
-| 첫 번째 알림 시간 ~ | ![neckshort](images/neckshort.png) | 자세를 점검해주세요 |
-| 두 번째 알림 시간 ~ | ![necklong](images/necklong.png) | 지금 바로 스트레칭하세요! |
+| 0분 ~ | ![neckno](images/neck_no.png) | 좋은 자세예요! |
+| 첫 번째 알림 시간 ~ | ![neckshort](images/neck_short.png) | 자세를 점검해주세요 |
+| 두 번째 알림 시간 ~ | ![necklong](images/neck_long.png) | 지금 바로 스트레칭하세요! |
 
 ## 설치 방법
 

@@ -7,6 +7,19 @@ const DEFAULT_TIMES = {
   warning: 20,
   danger: 50
 };
+const DEFAULT_REMINDER_TYPE = 'turtle';
+const ICONS = {
+  turtle: {
+    good: 'images/neck_no.png',
+    warning: 'images/neck_short.png',
+    danger: 'images/neck_long.png'
+  },
+  giraffe: {
+    good: 'images/giraffe_no.png',
+    warning: 'images/giraffe_short.png',
+    danger: 'images/giraffe_long.png'
+  }
+};
 
 // 확장 프로그램 설치 또는 업데이트 시
 chrome.runtime.onInstalled.addListener(async () => {
@@ -31,7 +44,7 @@ chrome.runtime.onStartup.addListener(async () => {
 
 // 타이머 초기화
 async function initializeTimer() {
-  const result = await chrome.storage.local.get(['startTime', 'notifiedWarning', 'notifiedDanger', 'times', 'notificationEnabled']);
+  const result = await chrome.storage.local.get(['startTime', 'notifiedWarning', 'notifiedDanger', 'times', 'notificationEnabled', 'reminderType']);
 
   if (!result.startTime) {
     await chrome.storage.local.set({
@@ -48,6 +61,10 @@ async function initializeTimer() {
   // 알림 기본값: 켜짐
   if (result.notificationEnabled === undefined) {
     await chrome.storage.local.set({ notificationEnabled: true });
+  }
+
+  if (!result.reminderType) {
+    await chrome.storage.local.set({ reminderType: DEFAULT_REMINDER_TYPE });
   }
 
   await startAlarm();
@@ -72,10 +89,11 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 
 // 경과 시간 계산 및 아이콘 업데이트
 async function checkAndUpdateIcon() {
-  const result = await chrome.storage.local.get(['startTime', 'notifiedWarning', 'notifiedDanger', 'times', 'notificationEnabled']);
+  const result = await chrome.storage.local.get(['startTime', 'notifiedWarning', 'notifiedDanger', 'times', 'notificationEnabled', 'reminderType']);
   const startTime = result.startTime;
   const times = result.times || DEFAULT_TIMES;
   const notificationEnabled = result.notificationEnabled === true;
+  const reminderType = result.reminderType || DEFAULT_REMINDER_TYPE;
 
   if (!startTime) {
     return;
@@ -86,23 +104,23 @@ async function checkAndUpdateIcon() {
   let iconPath;
 
   if (elapsedMinutes >= times.danger) {
-    iconPath = 'images/necklong.png';
+    iconPath = getIconPath(reminderType, 'danger');
 
     // 위험 알림 (한 번만)
     if (notificationEnabled && !result.notifiedDanger) {
-      await sendNotification('danger');
+      await sendNotification('danger', reminderType);
       await chrome.storage.local.set({ notifiedDanger: true });
     }
   } else if (elapsedMinutes >= times.warning) {
-    iconPath = 'images/neckshort.png';
+    iconPath = getIconPath(reminderType, 'warning');
 
     // 경고 알림 (한 번만)
     if (notificationEnabled && !result.notifiedWarning) {
-      await sendNotification('warning');
+      await sendNotification('warning', reminderType);
       await chrome.storage.local.set({ notifiedWarning: true });
     }
   } else {
-    iconPath = 'images/neckno.png';
+    iconPath = getIconPath(reminderType, 'good');
   }
 
   try {
@@ -119,21 +137,12 @@ async function checkAndUpdateIcon() {
 }
 
 // 알림 전송
-async function sendNotification(type) {
-  const messages = {
-    warning: {
-      title: '자세 점검 시간!',
-      message: '목과 어깨를 펴고 바른 자세를 유지하세요.',
-      icon: 'images/neckshort.png'
-    },
-    danger: {
-      title: '지금 바로 스트레칭!',
-      message: '오랜 시간 같은 자세입니다. 일어나서 스트레칭하세요!',
-      icon: 'images/necklong.png'
-    }
+async function sendNotification(type, reminderType) {
+  const msg = {
+    title: chrome.i18n.getMessage(type === 'warning' ? 'warning_title' : 'danger_title'),
+    message: chrome.i18n.getMessage(type === 'warning' ? 'warning_message' : 'danger_message'),
+    icon: getIconPath(reminderType, type)
   };
-
-  const msg = messages[type];
 
   chrome.notifications.create({
     type: 'basic',
@@ -175,6 +184,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     getNotificationEnabled().then((data) => sendResponse({ enabled: data }));
     return true;
   }
+
+  if (message.action === 'setReminderType') {
+    setReminderType(message.reminderType).then(() => sendResponse({ success: true }));
+    return true;
+  }
+
+  if (message.action === 'getReminderType') {
+    getReminderType().then((data) => sendResponse({ reminderType: data }));
+    return true;
+  }
 });
 
 // 타이머 리셋
@@ -189,12 +208,13 @@ async function resetTimer() {
 
 // 현재 상태 반환
 async function getStatus() {
-  const result = await chrome.storage.local.get(['startTime', 'times']);
+  const result = await chrome.storage.local.get(['startTime', 'times', 'reminderType']);
   const startTime = result.startTime || Date.now();
   const times = result.times || DEFAULT_TIMES;
+  const reminderType = result.reminderType || DEFAULT_REMINDER_TYPE;
   const elapsedMinutes = Math.floor((Date.now() - startTime) / 1000 / 60);
 
-  return { elapsedMinutes, times };
+  return { elapsedMinutes, times, reminderType };
 }
 
 // 시간 설정 업데이트
@@ -223,4 +243,22 @@ async function setNotificationEnabled(enabled) {
 async function getNotificationEnabled() {
   const result = await chrome.storage.local.get(['notificationEnabled']);
   return result.notificationEnabled === true;
+}
+
+// 알리미 유형 설정
+async function setReminderType(reminderType) {
+  const type = reminderType === 'giraffe' ? 'giraffe' : DEFAULT_REMINDER_TYPE;
+  await chrome.storage.local.set({ reminderType: type });
+  await checkAndUpdateIcon();
+}
+
+// 알리미 유형 반환
+async function getReminderType() {
+  const result = await chrome.storage.local.get(['reminderType']);
+  return result.reminderType || DEFAULT_REMINDER_TYPE;
+}
+
+function getIconPath(reminderType, level) {
+  const type = reminderType === 'giraffe' ? 'giraffe' : DEFAULT_REMINDER_TYPE;
+  return ICONS[type][level] || ICONS[DEFAULT_REMINDER_TYPE].good;
 }
