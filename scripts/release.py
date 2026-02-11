@@ -24,14 +24,20 @@ class ReleaseContext:
     root: Path
 
 
-INCLUDE_PATHS = [
+# Only include runtime files needed by the extension package.
+INCLUDE_FILES = [
     Path("manifest.json"),
     Path("background.js"),
     Path("popup.html"),
     Path("popup.js"),
     Path("style.css"),
+    Path("images/neck_no.png"),
+    Path("images/neck_long.png"),
+    Path("images/giraffe_no.png"),
+    Path("images/giraffe_long.png"),
+]
+INCLUDE_DIRS = [
     Path("_locales"),
-    Path("images"),
 ]
 
 
@@ -217,8 +223,8 @@ def resolve_release_notes(ctx: ReleaseContext, source: str) -> tuple[str, str]:
     return default_release_notes_template(ctx), "template-fallback"
 
 
-def iter_files(paths: Iterable[Path]) -> Iterable[Path]:
-    for rel_path in paths:
+def iter_files(dirs: Iterable[Path]) -> Iterable[Path]:
+    for rel_path in dirs:
         abs_path = ROOT / rel_path
         if not abs_path.exists():
             continue
@@ -230,9 +236,28 @@ def iter_files(paths: Iterable[Path]) -> Iterable[Path]:
                 yield child
 
 
+def unique_paths(paths: Iterable[Path]) -> list[Path]:
+    seen: set[Path] = set()
+    ordered: list[Path] = []
+    for path in paths:
+        if path in seen:
+            continue
+        seen.add(path)
+        ordered.append(path)
+    return ordered
+
+
+def iter_package_files() -> list[Path]:
+    required_files = [ROOT / rel_path for rel_path in INCLUDE_FILES]
+    missing = [str(path.relative_to(ROOT)) for path in required_files if not path.is_file()]
+    if missing:
+        raise FileNotFoundError(f"Required package files are missing: {', '.join(missing)}")
+    return unique_paths([*required_files, *iter_files(INCLUDE_DIRS)])
+
+
 def build_zip(ctx: ReleaseContext, zip_name: str, dry_run: bool) -> Path:
     zip_path = ROOT / zip_name
-    files = list(iter_files(INCLUDE_PATHS))
+    files = iter_package_files()
     if dry_run:
         return zip_path
 
