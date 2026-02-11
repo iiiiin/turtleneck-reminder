@@ -3,8 +3,7 @@
   "extDesc": { "message": "A Chrome extension that reminds you to check your posture at set intervals." },
   "reset_button": { "message": "Posture reset" },
   "settings_header": { "message": "Reminder timing" },
-  "first_alert": { "message": "First reminder" },
-  "second_alert": { "message": "Second reminder" },
+  "reminder_time": { "message": "Reminder time" },
   "notification_toggle": { "message": "Enable notifications" },
   "reminder_type": { "message": "Select reminder" },
   "reminder_turtle": { "message": "Turtle" },
@@ -12,15 +11,11 @@
   "save_button": { "message": "Save" },
   "save_done": { "message": "Saved" },
   "status_good": { "message": "Great posture!" },
-  "status_warning": { "message": "Time to check your posture" },
   "status_danger": { "message": "Stretch right now!" },
   "elapsed_time": {
     "message": "$minutes$ minutes elapsed",
     "placeholders": { "minutes": { "content": "$1" } }
   },
-  "warning_title": { "message": "Posture check time!" },
-  "warning_message": { "message": "Relax your neck and shoulders and keep a good posture." },
   "danger_title": { "message": "Stretch right now!" },
-  "danger_message": { "message": "You have been in the same posture for a while. Stand up and stretch." },
-  "alert_warning_before_danger": { "message": "The first reminder must be earlier than the second." }
+  "danger_message": { "message": "You have been in the same posture for a while. Stand up and stretch." }
 }

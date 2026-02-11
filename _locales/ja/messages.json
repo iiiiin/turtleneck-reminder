@@ -1,0 +1,21 @@
+{
+  "extName": { "message": "ストレートネック リマインダー" },
+  "extDesc": { "message": "一定時間ごとに姿勢チェックを知らせるChrome拡張機能です。" },
+  "reset_button": { "message": "姿勢リセット完了" },
+  "settings_header": { "message": "通知時間の設定" },
+  "reminder_time": { "message": "通知時間" },
+  "notification_toggle": { "message": "通知を受け取る" },
+  "reminder_type": { "message": "リマインダー選択" },
+  "reminder_turtle": { "message": "カメ" },
+  "reminder_giraffe": { "message": "キリン" },
+  "save_button": { "message": "保存" },
+  "save_done": { "message": "保存済み" },
+  "status_good": { "message": "姿勢は良好です！" },
+  "status_danger": { "message": "今すぐストレッチしましょう！" },
+  "elapsed_time": {
+    "message": "$minutes$分経過",
+    "placeholders": { "minutes": { "content": "$1" } }
+  },
+  "danger_title": { "message": "今すぐストレッチ！" },
+  "danger_message": { "message": "同じ姿勢が長く続いています。立ち上がってストレッチしましょう。" }
+}

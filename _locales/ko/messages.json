@@ -3,8 +3,7 @@
   "extDesc": { "message": "일정 시간마다 자세를 점검하도록 알려주는 확장프로그램입니다." },
   "reset_button": { "message": "자세 교정 완료" },
   "settings_header": { "message": "알림 시간 설정" },
-  "first_alert": { "message": "첫 번째 알림" },
-  "second_alert": { "message": "두 번째 알림" },
+  "reminder_time": { "message": "알림 시간" },
   "notification_toggle": { "message": "알림 받기" },
   "reminder_type": { "message": "알리미 선택" },
   "reminder_turtle": { "message": "거북이" },
@@ -12,15 +11,11 @@
   "save_button": { "message": "저장" },
   "save_done": { "message": "저장됨" },
   "status_good": { "message": "좋은 자세예요!" },
-  "status_warning": { "message": "자세를 점검해주세요" },
   "status_danger": { "message": "지금 바로 스트레칭하세요!" },
   "elapsed_time": {
     "message": "$minutes$분 경과",
     "placeholders": { "minutes": { "content": "$1" } }
   },
-  "warning_title": { "message": "자세 점검 시간!" },
-  "warning_message": { "message": "목과 어깨를 펴고 바른 자세를 유지하세요." },
   "danger_title": { "message": "지금 바로 스트레칭!" },
-  "danger_message": { "message": "오랜 시간 같은 자세입니다. 일어나서 스트레칭하세요!" },
-  "alert_warning_before_danger": { "message": "첫 번째 알림 시간은 두 번째보다 작아야 합니다." }
+  "danger_message": { "message": "오랜 시간 같은 자세입니다. 일어나서 스트레칭하세요!" }
 }

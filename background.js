@@ -4,19 +4,18 @@ const ALARM_INTERVAL_MINUTES = 1;
 
 // 기본 설정
 const DEFAULT_TIMES = {
-  warning: 20,
   danger: 50
 };
+const MIN_DANGER_MINUTES = 1;
+const MAX_DANGER_MINUTES = 180;
 const DEFAULT_REMINDER_TYPE = 'turtle';
 const ICONS = {
   turtle: {
     good: 'images/neck_no.png',
-    warning: 'images/neck_short.png',
     danger: 'images/neck_long.png'
   },
   giraffe: {
     good: 'images/giraffe_no.png',
-    warning: 'images/giraffe_short.png',
     danger: 'images/giraffe_long.png'
   }
 };
@@ -42,20 +41,35 @@ chrome.runtime.onStartup.addListener(async () => {
   await checkAndUpdateIcon();
 })();
 
+function normalizeDangerMinutes(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return DEFAULT_TIMES.danger;
+  }
+  const intValue = Math.floor(parsed);
+  if (intValue < MIN_DANGER_MINUTES) {
+    return MIN_DANGER_MINUTES;
+  }
+  if (intValue > MAX_DANGER_MINUTES) {
+    return MAX_DANGER_MINUTES;
+  }
+  return intValue;
+}
+
 // 타이머 초기화
 async function initializeTimer() {
-  const result = await chrome.storage.local.get(['startTime', 'notifiedWarning', 'notifiedDanger', 'times', 'notificationEnabled', 'reminderType']);
+  const result = await chrome.storage.local.get(['startTime', 'notifiedDanger', 'times', 'notificationEnabled', 'reminderType']);
 
   if (!result.startTime) {
     await chrome.storage.local.set({
       startTime: Date.now(),
-      notifiedWarning: false,
       notifiedDanger: false
     });
   }
 
-  if (!result.times) {
-    await chrome.storage.local.set({ times: DEFAULT_TIMES });
+  const normalizedDanger = normalizeDangerMinutes(result.times && result.times.danger);
+  if (!result.times || normalizedDanger !== Number(result.times.danger)) {
+    await chrome.storage.local.set({ times: { danger: normalizedDanger } });
   }
 
   // 알림 기본값: 켜짐
@@ -89,9 +103,9 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 
 // 경과 시간 계산 및 아이콘 업데이트
 async function checkAndUpdateIcon() {
-  const result = await chrome.storage.local.get(['startTime', 'notifiedWarning', 'notifiedDanger', 'times', 'notificationEnabled', 'reminderType']);
+  const result = await chrome.storage.local.get(['startTime', 'notifiedDanger', 'times', 'notificationEnabled', 'reminderType']);
   const startTime = result.startTime;
-  const times = result.times || DEFAULT_TIMES;
+  const dangerTime = normalizeDangerMinutes(result.times && result.times.danger);
   const notificationEnabled = result.notificationEnabled === true;
   const reminderType = result.reminderType || DEFAULT_REMINDER_TYPE;
 
@@ -103,21 +117,13 @@ async function checkAndUpdateIcon() {
 
   let iconPath;
 
-  if (elapsedMinutes >= times.danger) {
+  if (elapsedMinutes >= dangerTime) {
     iconPath = getIconPath(reminderType, 'danger');
 
     // 위험 알림 (한 번만)
     if (notificationEnabled && !result.notifiedDanger) {
-      await sendNotification('danger', reminderType);
+      await sendDangerNotification(reminderType);
       await chrome.storage.local.set({ notifiedDanger: true });
-    }
-  } else if (elapsedMinutes >= times.warning) {
-    iconPath = getIconPath(reminderType, 'warning');
-
-    // 경고 알림 (한 번만)
-    if (notificationEnabled && !result.notifiedWarning) {
-      await sendNotification('warning', reminderType);
-      await chrome.storage.local.set({ notifiedWarning: true });
     }
   } else {
     iconPath = getIconPath(reminderType, 'good');
@@ -137,11 +143,11 @@ async function checkAndUpdateIcon() {
 }
 
 // 알림 전송
-async function sendNotification(type, reminderType) {
+async function sendDangerNotification(reminderType) {
   const msg = {
-    title: chrome.i18n.getMessage(type === 'warning' ? 'warning_title' : 'danger_title'),
-    message: chrome.i18n.getMessage(type === 'warning' ? 'warning_message' : 'danger_message'),
-    icon: getIconPath(reminderType, type)
+    title: chrome.i18n.getMessage('danger_title'),
+    message: chrome.i18n.getMessage('danger_message'),
+    icon: getIconPath(reminderType, 'danger')
   };
 
   chrome.notifications.create({
@@ -200,7 +206,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 async function resetTimer() {
   await chrome.storage.local.set({
     startTime: Date.now(),
-    notifiedWarning: false,
     notifiedDanger: false
   });
   await checkAndUpdateIcon();
@@ -210,19 +215,20 @@ async function resetTimer() {
 async function getStatus() {
   const result = await chrome.storage.local.get(['startTime', 'times', 'reminderType']);
   const startTime = result.startTime || Date.now();
-  const times = result.times || DEFAULT_TIMES;
+  const dangerTime = normalizeDangerMinutes(result.times && result.times.danger);
   const reminderType = result.reminderType || DEFAULT_REMINDER_TYPE;
   const elapsedMinutes = Math.floor((Date.now() - startTime) / 1000 / 60);
 
-  return { elapsedMinutes, times, reminderType };
+  return { elapsedMinutes, times: { danger: dangerTime }, reminderType };
 }
 
 // 시간 설정 업데이트
 async function updateTimes(times) {
+  const normalizedDanger = normalizeDangerMinutes(times && times.danger);
+
   // 알림 플래그 초기화 (시간 변경 시)
   await chrome.storage.local.set({
-    times,
-    notifiedWarning: false,
+    times: { danger: normalizedDanger },
     notifiedDanger: false
   });
   await checkAndUpdateIcon();
@@ -231,7 +237,7 @@ async function updateTimes(times) {
 // 시간 설정 반환
 async function getTimes() {
   const result = await chrome.storage.local.get(['times']);
-  return result.times || DEFAULT_TIMES;
+  return { danger: normalizeDangerMinutes(result.times && result.times.danger) };
 }
 
 // 알림 설정

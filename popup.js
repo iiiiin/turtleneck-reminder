@@ -3,7 +3,6 @@ const statusIcon = document.getElementById('statusIcon');
 const elapsedTimeEl = document.getElementById('elapsedTime');
 const statusText = document.getElementById('statusText');
 const resetBtn = document.getElementById('resetBtn');
-const warningTimeInput = document.getElementById('warningTime');
 const dangerTimeInput = document.getElementById('dangerTime');
 const notificationToggle = document.getElementById('notificationToggle');
 const reminderTypeSelect = document.getElementById('reminderType');
@@ -11,12 +10,10 @@ const saveBtn = document.getElementById('saveBtn');
 const ICONS = {
     turtle: {
         good: 'images/neck_no.png',
-        warning: 'images/neck_short.png',
         danger: 'images/neck_long.png'
     },
     giraffe: {
         good: 'images/giraffe_no.png',
-        warning: 'images/giraffe_short.png',
         danger: 'images/giraffe_long.png'
     }
 };
@@ -41,10 +38,6 @@ async function updateStatus() {
         iconPath = getIconPath(reminderType, 'danger');
         message = chrome.i18n.getMessage('status_danger');
         stateClass = 'danger';
-    } else if (elapsedMinutes >= times.warning) {
-        iconPath = getIconPath(reminderType, 'warning');
-        message = chrome.i18n.getMessage('status_warning');
-        stateClass = 'warning';
     } else {
         iconPath = getIconPath(reminderType, 'good');
         message = chrome.i18n.getMessage('status_good');
@@ -54,14 +47,13 @@ async function updateStatus() {
     statusIcon.src = iconPath;
     statusText.textContent = message;
 
-    document.body.classList.remove('good', 'warning', 'danger');
+    document.body.classList.remove('good', 'danger');
     document.body.classList.add(stateClass);
 }
 
 // 설정 로드
 async function loadSettings() {
     const times = await chrome.runtime.sendMessage({ action: 'getTimes' });
-    warningTimeInput.value = times.warning;
     dangerTimeInput.value = times.danger;
 
     const response = await chrome.runtime.sendMessage({ action: 'getNotificationEnabled' });
@@ -99,17 +91,11 @@ reminderTypeSelect.addEventListener('change', async () => {
 
 // 저장 버튼
 saveBtn.addEventListener('click', async () => {
-    const warning = parseInt(warningTimeInput.value) || 20;
     const danger = parseInt(dangerTimeInput.value) || 50;
-
-    if (warning >= danger) {
-        alert(chrome.i18n.getMessage('alert_warning_before_danger'));
-        return;
-    }
 
     await chrome.runtime.sendMessage({
         action: 'updateTimes',
-        times: { warning, danger }
+        times: { danger }
     });
 
     saveBtn.textContent = chrome.i18n.getMessage('save_done');
