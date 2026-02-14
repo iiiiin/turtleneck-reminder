@@ -1,0 +1,21 @@
+{
+  "manifest_path": "manifest.json",
+  "changelog_path": "CHANGELOG.md",
+  "zip_name_template": "turtle-neck-reminder-{version}.zip",
+  "unreleased_heading": "## [Unreleased]",
+  "tag_prefix": "v",
+  "include_files": [
+    "manifest.json",
+    "background.js",
+    "popup.html",
+    "popup.js",
+    "style.css",
+    "images/neck_no.png",
+    "images/neck_long.png",
+    "images/giraffe_no.png",
+    "images/giraffe_long.png"
+  ],
+  "include_dirs": [
+    "_locales"
+  ]
+}
